@@ -98,6 +98,16 @@ namespace {
 		return std::string(data, size);
 	}
 
+	bool isCppSourceFile(const char* path)
+	{
+		if (path == nullptr) {
+			return false;
+		}
+		const std::filesystem::path extension =
+			std::filesystem::path(path).extension();
+		return extension == ".cpp" || extension == ".h";
+	}
+
 } // namespace
 
 int main(int argc, char* argv[])
@@ -157,6 +167,9 @@ int main(int argc, char* argv[])
 			const char* currentPath = changedFile->new_file.path;
 			const char* filePath =
 				changedFile->status == GIT_DELTA_DELETED ? oldPath : currentPath;
+			if (!isCppSourceFile(filePath)) {
+				continue;
+			}
 
 			// These contain the complete file contents, not merely diff hunks.
 			const std::string old =
